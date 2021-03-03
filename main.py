@@ -19,6 +19,10 @@ from pyproj import CRS, Transformer
 import xml.etree.ElementTree as ET
 
 osmPath = 'map.osm'
+regionSpecificScaleFactor = 1.0
+
+
+
 tree = ET.parse(osmPath)
 root = tree.getroot()
 
@@ -65,7 +69,7 @@ middleLat = (maxlat+minlat)/2
 middleLon = (maxlon+minlon)/2
 
 crs_4326  = CRS.from_epsg(4326) # epsg 4326 is wgs84
-uproj = CRS.from_proj4("+proj=tmerc +lat_0={0} +lon_0={1} +x_0=0 +y_0=0 +ellps=GRS80 +units=m".format(middleLat,middleLon))
+uproj = CRS.from_proj4("+proj=tmerc +lat_0={0} +lon_0={1} +x_0=0 +y_0=0 +k_0={2} +ellps=GRS80 +units=m".format(middleLat,middleLon, regionSpecificScaleFactor))
 transformer = Transformer.from_crs(crs_4326, uproj)
 
 def preemtivelyReverseCarlasSIMPLEProjection(lat,lon, transformer):
@@ -116,8 +120,8 @@ latitude_correction,longitude_correction = next(invtransformer.itransform([(wron
 
 
 stringToPutAsODriveHeader = """<header revMajor="1" revMinor="4" name="" version="1" date="2019-02-18T13:36:12" north="{0}" south="{1}" east="{2}" west="{3}">
-    <geoReference><![CDATA[+proj=tmerc +lat_0={4} +lon_0={5} +x_0=0 +y_0=0 +ellps=GRS80 +units=m +no_defs]]></geoReference>
-    </header>""".format(north,east,abs(south),abs(west),latitude_correction, longitude_correction)
+    <geoReference><![CDATA[+proj=tmerc +lat_0={4} +lon_0={5} +x_0=0 +y_0=0 +k_0={6} +ellps=GRS80 +units=m +no_defs]]></geoReference>
+    </header>""".format(north,east,abs(south),abs(west),latitude_correction, longitude_correction, regionSpecificScaleFactor)
 
 with open("/".join(osmPath.split("/")[:-1]+["replace_XodrHeader_with_this.txt"]), 'w') as f:
     f.write(stringToPutAsODriveHeader)

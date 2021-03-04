@@ -18,7 +18,7 @@ import numpy as np
 from pyproj import CRS, Transformer
 import xml.etree.ElementTree as ET
 
-osmPath = '/media/jhm/Samsung Evo SSD/Carla-Simple-OSM-Projection-Fix/map.osm'
+osmPath = 'map.osm'
 regionSpecificScaleFactor = 1.0
 
 

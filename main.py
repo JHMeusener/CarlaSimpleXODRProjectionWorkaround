@@ -18,7 +18,7 @@ import numpy as np
 from pyproj import CRS, Transformer
 import xml.etree.ElementTree as ET
 
-osmPath = 'map.osm'
+osmPath = '/media/jhm/Samsung Evo SSD/Carla-Simple-OSM-Projection-Fix/map.osm'
 regionSpecificScaleFactor = 1.0
 
 
@@ -44,7 +44,7 @@ for entity in root:
         for entity_2 in entity:
             if 'k' in entity_2.attrib:
                 if entity_2.attrib['k'] in ["highway"]:
-                    if entity_2.attrib['v'] in ["unclassified", "secondary", "primary"]:
+                    if entity_2.attrib['v'] in ["unclassified", "secondary", "primary", "tertiary", "residential"]:
                         containsImportantNodes = True
             if 'ref' in entity_2.attrib:
                 possibleNodes.append(entity_2.attrib['ref'])
@@ -117,7 +117,9 @@ wrongX_offset = middleLon_fake_offset * 111320. * np.cos(middleLat_fake_offset*2
 wrongY_offset = middleLat_fake_offset * 111136.
 invtransformer = Transformer.from_crs(uproj,crs_4326)
 latitude_correction,longitude_correction = next(invtransformer.itransform([(wrongX_offset,wrongY_offset)]))
-
+if latitude_correction > 180 or longitude_correction > 180:
+    latitude_correction = middleLat
+    longitude_correction = middleLon
 
 stringToPutAsODriveHeader = """<header revMajor="1" revMinor="4" name="" version="1" date="2019-02-18T13:36:12" north="{0}" south="{1}" east="{2}" west="{3}">
     <geoReference><![CDATA[+proj=tmerc +lat_0={4} +lon_0={5} +x_0=0 +y_0=0 +k_0={6} +ellps=GRS80 +units=m +no_defs]]></geoReference>
